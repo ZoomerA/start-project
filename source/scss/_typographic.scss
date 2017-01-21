@@ -1,0 +1,43 @@
+/* Подключить Bower  libsass-compass-vertical-rhythm 
+$ bower install --save-dev libsass-compass-vertical-rhythm
+ Подключить библиотеку Vertical-Rhythm 
+ */
+//@import "../../bower_components/libsass-compass-vertical-rhythm/lib/compass_rhythm.scss";
+
+
+/* Подключить шрифты */
+
+//@include font-face("HelveticaNeue-Light", url(
+//   "../fonts/Helvetica_Neue/HelveticaNeueCyr-Light.otf"  
+//     ) 
+// );
+
+$base-font-size: 20px !global;  // базовый размер шрифта
+$base-line-height: 30px !global; // $base-line-height = $base-font-size + ($base-font-size / 2)
+$rhythm-unit: "rem" !global;  // Какие единицы используем на выходе
+$rem-with-px-fallback: true !global;
+
+@include establish-baseline;  
+
+//  Высчитать  величины заголоков http://type-scale.com/
+
+h1 {
+  @include adjust-font-size-to(3.157rem);    
+}
+
+h2 { 
+  @include adjust-font-size-to(2.369rem);   
+}
+
+h3 {
+  @include adjust-font-size-to(1.777rem);
+}
+h4 {
+  @include adjust-font-size-to(1.333rem);
+}
+h5 {
+  @include adjust-font-size-to(1rem);   
+}
+h6 {
+  @include adjust-font-size-to(0.75rem); 
+}

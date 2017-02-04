@@ -10,6 +10,8 @@ var rename = require('gulp-rename');
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
 var browserSync = require('browser-sync');
+var useref = require('gulp-useref').stream;
+var gulpif = require('gulp-if');
 
 /* Переменные */
 var reload  = browserSync.reload;
@@ -27,7 +29,8 @@ var config = {
   	mainscss: './source/scss/main.scss',
   	html: './source/**/*.html',
     js: './source/js/*.js',
-    images: './source/images/**/*.*'
+    images: './source/images/**/*.*',
+    plugin: './source'
   },
 
   clean: {
@@ -41,6 +44,13 @@ var config = {
 
 
 /* Таски */
+/* BOWER */
+gulp.task('bower', function(){
+	return gulp.src(config.source.html)
+        .pipe(useref(
+        	directory: config.source.plugin))
+        .pipe(gulp.dest(config.source.html));
+})
 
 /* BROWSER SYNC*/
 gulp.task('browserSync', function() {
@@ -55,7 +65,7 @@ gulp.task('browserSync', function() {
 });
 
 /* HTML*/
-gulp.task('html', function(){
+gulp.task('html', ['bower'], function(){
 	return gulp.src(config.source.html)
 	.pipe(plumber())
 	.pipe(htmlExtend())
@@ -96,6 +106,7 @@ gulp.task('image', function(){
 	.pipe(gulp.dest(config.public.images))
 	//.pipe(reload({stream:true}));
 })
+
 
 /* WATCH */
 gulp.task('watcher', ['browserSync'], function(){

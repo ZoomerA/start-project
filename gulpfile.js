@@ -1,14 +1,18 @@
 /* Подключение компонентов */
 var gulp = require('gulp');
+var clean = require('gulp-clean');
 var sass = require('gulp-sass');
 var sassGlob = require('gulp-sass-glob'); // Инклюдим все файлы SCSS 
 var cssnano = require('gulp-cssnano'); // Минификатор CSS
+var uncss = require('gulp-uncss'); // Удаляет все неиспользуемые CSS классы 
 var image = require('gulp-image'); // Оптимизация картинок
 var htmlExtend = require('gulp-html-extend'); // Склеивание HTML блоков
 var autoprefixer = require('gulp-autoprefixer');
 var rename = require('gulp-rename');
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
+var jshint = require('gulp-jshint'); // Проверка JS на ошибки
+var jshintStylish = require('jshint-stylish'); // Визуализация ошибок для плагина  gulp-jshint
 var browserSync = require('browser-sync');
 var useref = require('gulp-useref'); // Разобраться и применить плагин для PRODACTION
 var gulpif = require('gulp-if');
@@ -33,7 +37,7 @@ var config = {
   	scss: './source/scss/**/*.scss',
   	mainscss: './source/scss/main.scss',
   	html: './source/**/*.html',
-    js: './source/js/*.js',
+    js: './source/js/**/*.js',
     images: './source/images/**/*.*',
    },
 
@@ -51,24 +55,30 @@ var config = {
 
 
 /* Таски */
+/* DELATE */
+gulp.task('delBowerLib', function(){ 
+	return gulp.src(config.public.bowerlib)
+	.pipe(clean())	// Очищаем папку с подключенными библиотеками
+	.pipe(notify('BOWER LIBS DELATE OK!!!'));
+})
 /* BOWER */
-gulp.task('bowerLib', function(){
-	var jsFilter = filter('**/*.+(js|css) ', {restore: true})
-		return gulp.src('bower.json')
-	 .pipe(mainBowerFiles())
-	 .pipe(jsFilter)
+gulp.task('bowerLib', ['delBowerLib'], function(){ 
+	var jsFilter = filter('**/*.+(js|css) ', {restore: true}) // Отфильтровываем JS CSS
+	return gulp.src('bower.json') // Читаем подключенные модули в BOWER
+	 .pipe(mainBowerFiles()) // Вытаскиваем пути файлов
+	 .pipe(jsFilter) // Фильтруем 
 	 .pipe(notify('BOWER LIBS COPY OK!!!'))	 
-     .pipe(gulp.dest(config.public.bowerlib));
+     .pipe(gulp.dest(config.public.bowerlib)); // Записываем в паблик библиотеки из BOWER
 })
 
 gulp.task('bower', ['bowerLib'], function(){
 	return gulp.src(config.source.html)
 	.pipe(plumber())
-	.pipe(wiredep({
+	.pipe(wiredep({				// Читаем пути библиотек BOWER
     	directory: "./plugin"	
     }))
 	.pipe(notify('BOWER INJECT OK!!!'))
-    .pipe(gulp.dest("./source/"));
+    .pipe(gulp.dest("./source/")); // Записываем пути BOWER в файл HTML
 })
 
 /* BROWSER SYNC*/
@@ -116,12 +126,16 @@ gulp.task('css', function(){
 /* JS */
 gulp.task('js', function(){
 	return gulp.src(config.source.js)
-		.pipe(plumber())
-		.pipe(concat('main.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(config.public.js))
-		.pipe(notify('Modify JS OK!!!'))
-		.pipe(reload({stream:true}));
+	.pipe(plumber())
+	.pipe(jshint())   // Проверяем на ощибки
+	.pipe(jshint.reporter('jshint-stylish')) // Визуализация ошибок
+	.pipe(concat('main.js')) // Соединяем файлы в один
+    .pipe(uglify({  		// Сжимаем файл
+    	comments : false
+    }))			 // Минификация
+    .pipe(gulp.dest(config.public.js))
+	.pipe(notify('Modify JS OK!!!'))
+	.pipe(reload({stream:true}));
 
 })
 

@@ -1,3 +1,2 @@
-$(document).ready(function(){
-	console.log("I'am carusel.js"); 
-});
+	console.log("I'am carusel.js NO!!!!");        
+ 

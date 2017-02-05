@@ -1,8 +1,8 @@
 /* Подключить Bower  libsass-compass-vertical-rhythm 
-$ bower install --save-dev libsass-compass-vertical-rhythm
+$ bower install --save libsass-compass-vertical-rhythm
  Подключить библиотеку Vertical-Rhythm 
  */
-//@import "../../bower_components/libsass-compass-vertical-rhythm/lib/compass_rhythm.scss";
+@import "../../plugin/libsass-compass-vertical-rhythm/lib/compass_rhythm.scss";
 
 
 /* Подключить шрифты */

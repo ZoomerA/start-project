@@ -10,7 +10,13 @@ var rename = require('gulp-rename');
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
 var browserSync = require('browser-sync');
-
+var useref = require('gulp-useref'); // Разобраться и применить плагин для PRODACTION
+var gulpif = require('gulp-if');
+var wiredep = require('wiredep').stream; // Дописывает пути плагинов из BOWER в html
+var uglify = require('gulp-uglify'); // Минификация JS
+var concat = require('gulp-concat'); // Склейка файлов
+var mainBowerFiles = require('gulp-main-bower-files'); // Вытаскивает пути к библиотекам Bower
+var filter = require('gulp-filter'); // Фильт расширений
 /* Переменные */
 var reload  = browserSync.reload;
 
@@ -20,6 +26,7 @@ var config = {
   	css: './public/css/',
   	html: './public/',
     js: './public/js/',
+    bowerlib: './public/plugin/',
     images: './public/images/**/*.*'
   },
   source: {
@@ -27,8 +34,8 @@ var config = {
   	mainscss: './source/scss/main.scss',
   	html: './source/**/*.html',
     js: './source/js/*.js',
-    images: './source/images/**/*.*'
-  },
+    images: './source/images/**/*.*',
+   },
 
   clean: {
   	css: './public/css/main.css',
@@ -38,9 +45,31 @@ var config = {
   }
 };	
 
+/*  BUILD  */
+
+
 
 
 /* Таски */
+/* BOWER */
+gulp.task('bowerLib', function(){
+	var jsFilter = filter('**/*.+(js|css) ', {restore: true})
+		return gulp.src('bower.json')
+	 .pipe(mainBowerFiles())
+	 .pipe(jsFilter)
+	 .pipe(notify('BOWER LIBS COPY OK!!!'))	 
+     .pipe(gulp.dest(config.public.bowerlib));
+})
+
+gulp.task('bower', ['bowerLib'], function(){
+	return gulp.src(config.source.html)
+	.pipe(plumber())
+	.pipe(wiredep({
+    	directory: "./plugin"	
+    }))
+	.pipe(notify('BOWER INJECT OK!!!'))
+    .pipe(gulp.dest("./source/"));
+})
 
 /* BROWSER SYNC*/
 gulp.task('browserSync', function() {
@@ -84,7 +113,17 @@ gulp.task('css', function(){
 	.pipe(notify('Modify-CSS OK!!!'))
 	.pipe(reload({stream:true}));
 })
+/* JS */
+gulp.task('js', function(){
+	return gulp.src(config.source.js)
+		.pipe(plumber())
+		.pipe(concat('main.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(config.public.js))
+		.pipe(notify('Modify JS OK!!!'))
+		.pipe(reload({stream:true}));
 
+})
 
 /* IMAGE */
 
@@ -97,10 +136,14 @@ gulp.task('image', function(){
 	//.pipe(reload({stream:true}));
 })
 
+
 /* WATCH */
 gulp.task('watcher', ['browserSync'], function(){
-	gulp.watch(config.source.scss, ['css']);
-	gulp.watch(config.source.html, ['html']);
+	gulp.watch(config.source.scss, ['css'])
+	gulp.watch(config.source.html, ['html'])
+	gulp.watch(config.source.js, ['js'])
+	gulp.watch(config.source.images, ['image'])
+	gulp.watch("bower.json", ['bower']);
 
 })
 

@@ -12,12 +12,16 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "plugin",
     "test",
     "tests"
   ],
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
     "susy": "^2.2.12",
-    "reset-scss": "^2.0.2",
-    "compass-mixins": "^1.0.2"
+    "libsass-compass-vertical-rhythm": "^1.0.0",
+    "compass-mixins": "^1.0.2",
+    "jquery": "^3.1.1",
+    "reset-css": "^2.2.0"
   }
 }

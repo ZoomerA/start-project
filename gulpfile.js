@@ -46,9 +46,8 @@ var config = {
 /* Таски */
 /* BOWER */
 gulp.task('bower', function(){
-	return gulp.src(config.source.html)
-        .pipe(useref(
-        	directory: config.source.plugin))
+	return gulp.src()
+        .pipe(useref())
         .pipe(gulp.dest(config.source.html));
 })
 

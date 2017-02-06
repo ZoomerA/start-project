@@ -9,8 +9,7 @@ var image = require('gulp-image'); // Оптимизация картинок
 var htmlExtend = require('gulp-html-extend'); // Склеивание HTML блоков
 var autoprefixer = require('gulp-autoprefixer');
 var rename = require('gulp-rename');
-var plumber = require('gulp-plumber');
-var notify = require('gulp-notify');
+var notify = require('gulp-notify'); // отлов ошибок
 var jshint = require('gulp-jshint'); // Проверка JS на ошибки
 var jshintStylish = require('jshint-stylish'); // Визуализация ошибок для плагина  gulp-jshint
 var browserSync = require('browser-sync');
@@ -21,9 +20,9 @@ var uglify = require('gulp-uglify'); // Минификация JS
 var concat = require('gulp-concat'); // Склейка файлов
 var mainBowerFiles = require('gulp-main-bower-files'); // Вытаскивает пути к библиотекам Bower
 var filter = require('gulp-filter'); // Фильт расширений
-var useref = require('gulp-useref').stream;
-var gulpif = require('gulp-if');
-
+var gutil = require('gulp-util'); // Вспомогательный плагин 
+var chalk = require('chalk'); // Плагин для красивого вывода в консоль
+var plumber = require('gulp-plumber');
 
 /* Переменные */
 var reload  = browserSync.reload;
@@ -85,13 +84,14 @@ gulp.task('bower', ['bowerLib'], function(){
     }))
 	.pipe(notify('BOWER INJECT OK!!!'))
     .pipe(gulp.dest("./source/")); // Записываем пути BOWER в файл HTML
+})
 
 /* BOWER */
-gulp.task('bower', function(){
+/*gulp.task('bower', function(){
 	return gulp.src()
         .pipe(useref())
         .pipe(gulp.dest(config.source.html));
-})
+})*/
 
 /* BROWSER SYNC*/
 gulp.task('browserSync', function() {
@@ -105,61 +105,61 @@ gulp.task('browserSync', function() {
   });
 });
 
+
 /* HTML*/
-gulp.task('html', ['bower'], function(){
+gulp.task('html', function(){
 	return gulp.src(config.source.html)
-	.pipe(plumber())
 	.pipe(htmlExtend())
 	.pipe(gulp.dest(config.public.html))
-	.pipe(plumber.stop())
-	.pipe(notify('HTML OK!!!'))
+	.pipe(notify(chalk.bgGreen.green.bold('HTML OK!!!')))
 	.pipe(reload({stream:true}));
 })
 
 /*  SCSS and CSS and Modify */
 gulp.task('css', function(){
 	return gulp.src(config.source.mainscss)
-	.pipe(plumber())
 	.pipe(sassGlob())
-	.pipe(sass())
+	.pipe(sass()
+		.on('error', notify.onError(function(error){
+			return "Message to the notifier: " + error.message;
+		}))
+	)
 	.pipe(autoprefixer({
 		browsers: ['last 3 versions'],
 		cascade: false
 	}))
 	.pipe(gulp.dest(config.public.css))
-	.pipe(notify('CSS OK!!!'))
+	.pipe(notify(chalk.bgGreen.white.bold('CSS OK!!!')))
 	.pipe(cssnano())
 	.pipe(rename('style.min.css'))
-	.pipe(plumber.stop())
 	.pipe(gulp.dest(config.public.css))
-	.pipe(notify('Modify-CSS OK!!!'))
+	.pipe(notify(chalk.bgGreen.white.bold('Modify-CSS OK!!!')))
 	.pipe(reload({stream:true}));
 })
 /* JS */
 gulp.task('js', function(){
 	return gulp.src(config.source.js)
-	.pipe(plumber())
+	.pipe(plumber())  // Проверяем на ошибки
 	.pipe(jshint())   // Проверяем на ощибки
 	.pipe(jshint.reporter('jshint-stylish')) // Визуализация ошибок
 	.pipe(concat('main.js')) // Соединяем файлы в один
+	.pipe(gulp.dest(config.public.js))
     .pipe(uglify({  		// Сжимаем файл
     	comments : false
     }))			 // Минификация
+    .pipe(rename('main.min.js')) // Переименовываем
     .pipe(gulp.dest(config.public.js))
-	.pipe(notify('Modify JS OK!!!'))
+	.pipe(notify(chalk.bgGreen.green.bold('Modify JScript OK!!!')))
 	.pipe(reload({stream:true}));
-
 })
 
 /* IMAGE */
 
 gulp.task('image', function(){
 	return gulp.src(config.source.images)
-	.pipe(plumber())
 	.pipe(image())
-	.pipe(plumber.stop())
 	.pipe(gulp.dest(config.public.images))
-	//.pipe(reload({stream:true}));
+	.pipe(reload({stream:true}));
 })
 
 
@@ -170,9 +170,9 @@ gulp.task('watcher', ['browserSync'], function(){
 	gulp.watch(config.source.js, ['js'])
 	gulp.watch(config.source.images, ['image'])
 	gulp.watch("bower.json", ['bower']);
-
 })
 
 gulp.task('default', ['watcher'], function(){
 
 })
+

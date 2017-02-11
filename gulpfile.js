@@ -86,12 +86,6 @@ gulp.task('bower', ['bowerLib'], function(){
     .pipe(gulp.dest("./source/")); // Записываем пути BOWER в файл HTML
 })
 
-/* BOWER */
-/*gulp.task('bower', function(){
-	return gulp.src()
-        .pipe(useref())
-        .pipe(gulp.dest(config.source.html));
-})*/
 
 /* BROWSER SYNC*/
 gulp.task('browserSync', function() {
@@ -130,7 +124,7 @@ gulp.task('css', function(){
 	}))
 	.pipe(gulp.dest(config.public.css))
 	.pipe(notify(chalk.bgGreen.white.bold('CSS OK!!!')))
-	.pipe(cssnano())
+	.pipe(cssnano()) // жимаем CSS
 	.pipe(rename('style.min.css'))
 	.pipe(gulp.dest(config.public.css))
 	.pipe(notify(chalk.bgGreen.white.bold('Modify-CSS OK!!!')))
@@ -176,3 +170,19 @@ gulp.task('default', ['watcher'], function(){
 
 })
 
+var alarm = chalk.bgRed.white.bold('ALARM!!!');
+
+
+gulp.task('color', function(){
+	/*var i = 1
+	 for(var i in gutil)
+    console.log('gutil[' + i + '] = ' + gutil[i])*/
+	
+	gutil.file = 'one.js'
+
+	//return gulp.src(config.source.js)
+	//gutil.template('<%= file.path %');
+
+
+	
+})

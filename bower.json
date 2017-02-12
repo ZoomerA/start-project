@@ -16,12 +16,14 @@
     "test",
     "tests"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "scss-color": "^1.0.3"
+  },
   "dependencies": {
     "susy": "^2.2.12",
     "libsass-compass-vertical-rhythm": "^1.0.0",
     "compass-mixins": "^1.0.2",
     "jquery": "^3.1.1",
-    "reset-css": "^2.2.0",
+    "reset-css": "^2.2.0"
   }
 }
